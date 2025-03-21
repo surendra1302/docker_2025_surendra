@@ -1,0 +1,25 @@
+# Use Ubuntu as base image
+FROM ubuntu:latest
+
+# Set environment variables
+ENV TOMCAT_VERSION=10.1.17
+ENV CATALINA_HOME=/usr/local/tomcat
+ENV PATH=$CATALINA_HOME/bin:$PATH
+
+# Install required dependencies and download Tomcat
+RUN apt-get update && apt-get install -y wget curl openjdk-11-jdk && \
+    echo "Downloading Tomcat version: $TOMCAT_VERSION" && \
+    wget "https://archive.apache.org/dist/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz" -O /tmp/apache-tomcat.tar.gz && \
+    tar xvf /tmp/apache-tomcat.tar.gz -C /usr/local/ && \
+    mv /usr/local/apache-tomcat-${TOMCAT_VERSION} /usr/local/tomcat && \
+    rm /tmp/apache-tomcat.tar.gz && \
+    chmod +x /usr/local/tomcat/bin/*.sh
+
+# Expose Tomcat Port
+EXPOSE 8080
+
+# Set working directory
+WORKDIR /usr/local/tomcat
+
+# Start Tomcat when container runs
+CMD ["catalina.sh", "run"]
